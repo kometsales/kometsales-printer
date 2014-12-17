@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation=" 
+            http://www.springframework.org/schema/beans      
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+            http://www.springframework.org/schema/tx  
+            http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+            http://www.springframework.org/schema/context  
+            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+            http://www.springframework.org/schema/task 
+            http://www.springframework.org/schema/task/spring-task-3.0.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util.xsd">
+	<context:annotation-config />
+	<context:component-scan base-package="vertical.fl.kometPrinter" />
+	<task:annotation-driven />
+
+	<!-- Configuración de tareas programadas -->
+	<bean id="queueCheckerService" class="vertical.fl.kometPrinter.service.QueueCheckerService" />
+
+	<!-- JOB 1 -->
+	<!-- Clase de Spring que se encarga de la llamada al metodo checkMemory 
+		de la clase MemoryViewer -->
+	<bean id="jobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="queueCheckerService" />
+		<property name="targetMethod" value="checkQueue" />
+	</bean>
+	<!-- Configuracion de la planificacion de la tarea -->
+	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="jobDetail" />
+		<!-- Empieza pasados 0 segundos -->
+		<property name="startDelay" value="0" />
+		<!-- Repite cada segundo -->
+		<property name="repeatInterval" value="1000" />
+	</bean>
+
+	<!-- JOB 2 -->
+	<bean id="jobDetail2"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="queueCheckerService" />
+		<property name="targetMethod" value="checkQueue" />
+	</bean>
+	<!-- Configuracion de la planificacion de la tarea -->
+	<bean id="simpleTrigger2" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="jobDetail2" />
+		<!-- Empieza pasados 0 segundos -->
+		<property name="startDelay" value="0" />
+		<!-- Repite cada segundo -->
+		<property name="repeatInterval" value="1000" />
+	</bean>
+
+	<!-- JOB 3 -->
+	<bean id="jobDetail3"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="queueCheckerService" />
+		<property name="targetMethod" value="checkQueue" />
+	</bean>
+	<!-- Configuracion de la planificacion de la tarea -->
+	<bean id="simpleTrigger3" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="jobDetail3" />
+		<!-- Empieza pasados 0 segundos -->
+		<property name="startDelay" value="0" />
+		<!-- Repite cada segundo -->
+		<property name="repeatInterval" value="1000" />
+	</bean>
+
+	<!-- JOB 4 -->
+	<bean id="jobDetail4"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="queueCheckerService" />
+		<property name="targetMethod" value="checkQueue" />
+	</bean>
+	<!-- Configuracion de la planificacion de la tarea -->
+	<bean id="simpleTrigger4" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<property name="jobDetail" ref="jobDetail4" />
+		<!-- Empieza pasados 0 segundos -->
+		<property name="startDelay" value="0" />
+		<!-- Repite cada segundo -->
+		<property name="repeatInterval" value="1000" />
+	</bean>
+
+	<!-- Factoria de creacion del bean encargado de realizar la planificacion 
+		de la tarea -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="simpleTrigger" />
+				<ref bean="simpleTrigger2" />
+				<ref bean="simpleTrigger3" />
+				<ref bean="simpleTrigger4" />
+			</list>
+		</property>
+		<property name="quartzProperties">
+			<props>
+				<!-- ThreadPool -->
+				<prop key="org.quartz.scheduler.instanceName">PrinterJob_</prop>
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">1</prop>
+				<prop key="org.quartz.threadPool.threadPriority">5</prop>
+				<!-- Job store -->
+				<prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+				<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="restEndPoint" class="vertical.fl.kometPrinter.endPoint.RestEndPoint" />
+	<bean id="jmsEndPoint" class="vertical.fl.kometPrinter.endPoint.JmsEndPoint" />
+	<bean id="queueController" class="vertical.fl.kometPrinter.control.QueueController" />
+	<bean id="restController" class="vertical.fl.kometPrinter.control.RestController" />
+	<bean id="memoryDBManager" class="vertical.fl.kometPrinter.utils.MemoryDBManager" />
+	<bean id="printerService" class="vertical.fl.kometPrinter.service.PrinterService" />
+</beans>
